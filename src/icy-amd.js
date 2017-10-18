@@ -10,7 +10,11 @@
   let moduleCache = {},
 
       // get relative url of module
-      getUrl = (moduleUrl) => String(moduleUrl).replace(/\.js$/g, '') + '.js';
+      getUrl = (moduleUrl) => {
+        let getScript = String(moduleUrl).replace(/\.js$/g, '') + '.js';
+        console.log(getScript);
+        return getScript;
+      },
 
       // load module from src
       loadScript = function (src) {
@@ -25,8 +29,20 @@
         document.getElementsByTagName('head')[0].appendChild(_script);
       },
 
-      setModule = function () {
+      setModule = function (moduleUrl, params, callback) {
+        let _module;
+        if (moduleCache[moduleUrl]) {
 
+          _module = moduleCache[moduleUrl];
+          _module.status = 'loaded';
+          _module.args = callback ? callback.apply(_module, params) : null;
+
+          while (fn = _module.onlaod.shift()) {
+            fn(_module.args);
+          }
+        } else {
+          callback && callback.apply(null, params);
+        }
       },
 
       /**
@@ -63,14 +79,14 @@
       };
 
   /**
-   * @param {String} exportName --define the name of this module
+   * @param {String} url --set the loading url of this module
    * @param {Array} modDeps --the dependencies of this module
    * @param {Function} modConstructor --the module constructor
    */
   AMD.module = function () {
 
     // turn arguments Object into Array
-    let args = [].slice.call(argumentns),
+    let args = [].slice.call(arguments),
 
         // get the last argument as constructor
         modConstructor = args.pop(),
@@ -78,14 +94,16 @@
         // does modDeps exist ?
         modDeps = (args.length && args[arguments.length - 1] instanceof Array) ? args.pop() : [],
 
-        // does exportName exist ?
-        exportName = args.length ? args.pop() : null,
+        // does url exist ?
+        url = args.length ? args.pop() : null,
 
         //
         params = [],
 
         // get the length of dependencies
         modLength = modDeps.length,
+
+        depsCount = 0,
 
         // count the loaded module
         i = 0;
@@ -94,16 +112,24 @@
       while (i < modLength) {
         // use Anonymous Function to save field i
         (function (i) {
+          // add one dependency that haven't loaded
+          depsCount++;
           loadModule(modDeps[i], function (mod) {
             params[i] = mod;
+            // one dependency loaded
+            depsCount--;
+            if (depsCount) {
+              setModule(url, params, callback);
+            }
+          });
 
-          })
-        })();
+        })(i);
+        i++;
       }
+    } else {
+      setModule(url, [], modConstructor);
     }
   };
-
-
 
 })((function () {
   'use strict';
