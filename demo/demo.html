@@ -9,10 +9,8 @@
     <button id="dem">demo</button>
     <script>
       AMD.module(['./event', './dom'], function (events, dom) {
-        console.log(events, dom);
-        events.on('demo', 'click', function () {
-          dom.html('demo', 'success');
-        });
+        events();
+        dom();
       });
     </script>
   </body>
