@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>AMD</title>
+    <script src="../src/icy-amd.js"></script>
+  </head>
+  <body>
+    <button id="dem">demo</button>
+    <script>
+      AMD.module(['./event', './dom'], function (events, dom) {
+        console.log(events, dom);
+        events.on('demo', 'click', function () {
+          dom.html('demo', 'success');
+        });
+      });
+    </script>
+  </body>
+</html>
