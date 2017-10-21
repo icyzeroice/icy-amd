@@ -10,5 +10,8 @@
     "amd"
   ],
   "author": "Ice Zero",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jshint": "^2.9.5"
+  }
 }

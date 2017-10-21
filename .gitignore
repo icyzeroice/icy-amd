@@ -1,0 +1,7 @@
+#### for editors or ide
+*~
+.idea/
+.vscode/
+
+#### for node
+node_modules/

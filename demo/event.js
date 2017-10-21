@@ -1,3 +1,3 @@
-AMD.module('./event', ['./dom'], function (dom) {
+define('./event', ['./dom'], function (dom) {
   return console.log('this is event module', dom);
 });

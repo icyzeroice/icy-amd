@@ -1,0 +1,9 @@
+#+TITLE: demo for AMD
+
+* Usage
+
+Please refer to demo floder.
+
+* Reference
+
+《JavaScript 设计模式（张荣铭 著）》
