@@ -7,13 +7,13 @@
 
       // cache all the loaded modules
   var moduleCache = {},
-
-      moduleLine = [],
+      //initScriptNum = document.scripts.length,
 
       // get script url via module name
       getUrl = function (moduleUrl) {
 
         // FIXME: improve RegExp
+        // TODO: change to use absolute url for cache a module that is expressed by different url
         // make sure of extension name '.js'
         return moduleUrl.replace(/\.js$/, '').concat('.js');
       },
@@ -31,24 +31,30 @@
         _script.type = 'text/javascript';
         _script.src = scriptUrl;
 
-        document.getElementsByTagName('head')[0].appendChild(_script);
+        // get absolute url
+        // _script.src
+
+        document.getElementsByTagName('body')[0].appendChild(_script);
       },
 
-      loadModule = function (name, callback) {
-        var _module = moduleCache[name];
+      loadDependency = function (name, callback) {
+        var _module;
 
         // if cached
-        if (_module) {
+        if (_module = moduleCache[name]) {
 
           // while loaded
           if (_module.state === 'loaded') {
-            setTimeout(callback(_module.params), 0);
+
+            // while loaded, pass the one object
+            // FIXME: any problem?
+            setTimeout(callback(_module.exports), 0);
           } else {
             _module.callbacks.push(callback);
           }
         } else {
 
-          // if module haven't cached
+          // if module haven't cached, load it
           moduleCache[name] = {
             name: name,
             state: 'loading',
@@ -65,15 +71,16 @@
        * @param {Array} params
        * @param {Function} callback
        */
-      setModule = function (name, params, callback) {
-        var _module = moduleCache[name], fn;
+      createModule = function (name, params, callback) {
+        var _module, fn;
 
-        if (_module) {
+        if (_module = moduleCache[name]) {
 
           // let module turn to loaded state
           _module.state = 'loaded';
 
           // while callback exists, pass the module object
+          // FIXME: should not be used here
           _module.exports = callback ? callback.apply(_module, params) : null;
 
           while (fn = _module.callbacks.shift()) {
@@ -86,7 +93,6 @@
           // Asynchronous module
           callback && callback.apply(_module, params);
         }
-
       };
 
   /**
@@ -98,12 +104,11 @@
 
     // Object -> Array
     var args = [].splice.call(arguments, 0),
-
         // weather callback exist or not
         callback = typeof args[args.length - 1] === 'function' ? args.pop() : null,
 
         // dependencies is Array
-        dependencies = args[args.length -1] instanceof Array ? args.pop() : [],
+        dependencies = args[args.length - 1] instanceof Array ? args.pop() : [],
         depsLength,
 
         // if args.length is 0, name is null
@@ -115,37 +120,37 @@
 
         countLoadingDeps = 0,
 
-        currentIndex = 0;
+        depsIndex = 0;
 
     if(depsLength = dependencies.length) {
 
       // load each dependency
-      while (currentIndex < depsLength) {
+      while (depsIndex < depsLength) {
 
-        // set a closure to save the function scope, especially the variable currentIndex
-        (function (currentIndex) {
+        // set a closure to save the function scope, especially the variable depsIndex
+        (function (depsIndex) {
           countLoadingDeps++;
 
           // load one module and pass the module object
-          loadModule(dependencies[currentIndex], function (currentModule) {
+          loadDependency(dependencies[depsIndex], function (currentDependency) {
             countLoadingDeps--;
 
+            // pass the module object according to read order
+            params[depsIndex] = currentDependency;
 
-            params[currentIndex] = currentModule;
-
-            // while all the module loaded
+            // while all the dependencies loaded
             if (!countLoadingDeps) {
-              setModule(name, params, callback);
+              createModule(name, params, callback);
             }
           });
-        })(currentIndex);
-        currentIndex++;
+        })(depsIndex);
+        depsIndex++;
 
       }
     } else {
 
       // while there is no dependency, generate it directly
-      setModule(name, [], callback);
+      createModule(name, [], callback);
     }
   };
 })((function () {

@@ -4,6 +4,31 @@
 
 Please refer to demo floder.
 
+* Flow
+
+
+  +--------+
+  | define |
+  +---+----+
+      |     no dependency                      +-------------+  no dependency
+      +--------------------------------------->|createModule |----------------->function
+      |dependencies                         ^  +-------------+
+      v                                     |  |             |no name 
+  +----------------+                        |  |             v
+  | loadDependency | cached  +-----------+  |  |       +-------------+
+  +---+------------+-------->|           |  |  |       |             |
+      |have't cached         +-----+-----+  |  |       +-------------+
+      v                            |        |  |
+  +----------------+               v        |  |
+  |                |         +-----------+  |  |
+  +----------------+         |all cached |  |  |
+                             +-----------+--+  |
+                                               |
+                                               v
+
+
+
+
 * Reference
 
 《JavaScript 设计模式（张荣铭 著）》
