@@ -84,7 +84,7 @@
           try {
             _module.exports = callback.apply(callback, params);
           } catch (e) {
-            console.log(e);
+            console.error('Please check your return content');
           }
           while (fn = _module.callbacks.shift()) {
 
@@ -98,7 +98,7 @@
           try {
             callback && callback.apply(callback, params);
           } catch (e) {
-            console.log(e);
+            console.error('Please check your return content');
           }
         }
       };
