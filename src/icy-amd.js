@@ -58,7 +58,7 @@
           moduleCache[name] = {
             name: name,
             state: 'loading',
-            exports: null,
+            exports: callback,
             callbacks: [callback]
           };
 
@@ -80,9 +80,12 @@
           _module.state = 'loaded';
 
           // while callback exists, pass the module object
-          // FIXME: should not be used here
-          _module.exports = callback ? callback.apply(_module, params) : null;
-
+          // FIXME: what to throw
+          try {
+            _module.exports = callback.apply(callback, params);
+          } catch (e) {
+            console.log(e);
+          }
           while (fn = _module.callbacks.shift()) {
 
             // export the module object to callbacks
@@ -90,8 +93,13 @@
           }
         } else {
 
-          // Asynchronous module
-          callback && callback.apply(_module, params);
+          // module not cached
+          // FIXME: what error
+          try {
+            callback && callback.apply(callback, params);
+          } catch (e) {
+            console.log(e);
+          }
         }
       };
 
@@ -144,8 +152,8 @@
             }
           });
         })(depsIndex);
-        depsIndex++;
 
+        depsIndex++;
       }
     } else {
 
