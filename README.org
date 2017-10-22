@@ -6,6 +6,7 @@ Please refer to demo floder.
 
 * Flow
 
+#+BEGIN_EXAMPLE
 
   +--------+
   | define |
@@ -27,6 +28,8 @@ Please refer to demo floder.
                                                v
 
 
+
+#+END_EXAMPLE
 
 
 * Reference
