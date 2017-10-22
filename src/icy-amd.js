@@ -14,11 +14,11 @@
       getUrl = function (moduleUrl) {
 
         // FIXME: improve RegExp
-        // dispose of extension name '.js'
-        return relativeUrl.replace(/\.js$/, '');
+        // make sure of extension name '.js'
+        return moduleUrl.replace(/\.js$/, '').concat('.js');
       },
 
-      //
+      // insert async script in document
       loadScript = function (scriptUrl) {
 
         // TODO: add node enviroment
@@ -100,10 +100,10 @@
     var args = [].splice.call(arguments, 0),
 
         // weather callback exist or not
-        callback = typeof args[args.length - 1] === 'function' ? args.pop() : undefined,
+        callback = typeof args[args.length - 1] === 'function' ? args.pop() : null,
 
         // dependencies is Array
-        dependencies = args[args.length -1] instanceof Array ? args.pop() : undefined,
+        dependencies = args[args.length -1] instanceof Array ? args.pop() : [],
         depsLength,
 
         // if args.length is 0, name is null
@@ -120,7 +120,7 @@
     if(depsLength = dependencies.length) {
 
       // load each dependency
-      while (depsLength) {
+      while (currentIndex < depsLength) {
 
         // set a closure to save the function scope, especially the variable currentIndex
         (function (currentIndex) {
@@ -129,6 +129,7 @@
           // load one module and pass the module object
           loadModule(dependencies[currentIndex], function (currentModule) {
             countLoadingDeps--;
+
 
             params[currentIndex] = currentModule;
 

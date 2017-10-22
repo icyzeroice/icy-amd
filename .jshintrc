@@ -4,6 +4,7 @@
   "esversion": 5,
   "globals": {
     "setTimeout": true,
-    "document": true
+    "document": true,
+    "console": true
   }
 }
